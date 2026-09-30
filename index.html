@@ -3,11 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Soundboard</title>
+  <title>사운드보드</title>
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#1e1f22" />
   <style>
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
     body {
       margin: 0;
       padding: 16px;
@@ -15,107 +19,144 @@
       color: #f2f3f5;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
-    h1 { font-size: 1.25rem; margin-bottom: 16px; text-align: center; }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding: 0 4px;
+    }
+    h1 {
+      font-size: 1.15rem;
+      margin: 0;
+      color: #ffffff;
+      font-weight: 700;
+    }
+    .stop-all-btn {
+      background: #da373c;
+      color: #ffffff;
+      border: none;
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .stop-all-btn:active {
+      background: #a1282c;
+    }
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-      gap: 12px;
+      grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
+      gap: 10px;
     }
     .sound-btn {
       background: #2b2d31;
       border: 1px solid #35373c;
       border-radius: 8px;
       color: #dbdee1;
-      padding: 16px 8px;
+      padding: 14px 6px;
       font-size: 0.85rem;
       font-weight: 600;
       cursor: pointer;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
-      word-break: break-all;
-      transition: background 0.1s, transform 0.1s;
+      word-break: keep-all;
+      min-height: 52px;
+      transition: background 0.1s, transform 0.08s;
     }
     .sound-btn:active {
       background: #5865f2;
-      color: #fff;
+      color: #ffffff;
       transform: scale(0.96);
     }
   </style>
 </head>
 <body>
-  <h1>전용 사운드보드</h1>
+  <header>
+    <h1>키보토스 샬레 사운드보드</h1>
+    <button class="stop-all-btn" id="stopAll">전체 정지</button>
+  </header>
+
   <div class="grid" id="grid"></div>
 
   <script>
-    // 42개 사운드 목록 (이름을 원하는 텍스트로 지정 가능)
     const soundList = [
-      { id: "1515715927709057084", name: "사운드 1" },
-      { id: "1515716429389889647", name: "사운드 2" },
-      { id: "1515717013668888586", name: "사운드 3" },
-      { id: "1515717276966453359", name: "사운드 4" },
-      { id: "1515717362178068692", name: "사운드 5" },
-      { id: "1515718417028612096", name: "사운드 6" },
-      { id: "1515718796026052658", name: "사운드 7" },
-      { id: "1515718906927644723", name: "사운드 8" },
-      { id: "1515718956164321341", name: "사운드 9" },
-      { id: "1515719658882469949", name: "사운드 10" },
-      { id: "1515719771822358548", name: "사운드 11" },
-      { id: "1515719834636386324", name: "사운드 12" },
-      { id: "1515719884758188173", name: "사운드 13" },
-      { id: "1515719965494218802", name: "사운드 14" },
-      { id: "1515720024407412746", name: "사운드 15" },
-      { id: "1515720066967015446", name: "사운드 16" },
-      { id: "1515741605511037018", name: "사운드 17" },
-      { id: "1515742529541246986", name: "사운드 18" },
-      { id: "1515744167597179042", name: "사운드 19" },
-      { id: "1515744217685823819", name: "사운드 20" },
-      { id: "1515744246223736916", name: "사운드 21" },
-      { id: "1515745071935524955", name: "사운드 22" },
-      { id: "1515999347236671568", name: "사운드 23" },
-      { id: "1535917646501904405", name: "사운드 24" },
-      { id: "1535918256202850327", name: "사운드 25" },
-      { id: "1535918445982388224", name: "사운드 26" },
-      { id: "1535918793858220072", name: "사운드 27" },
-      { id: "1535918942776729620", name: "사운드 28" },
-      { id: "1535919527651446904", name: "사운드 29" },
-      { id: "1535920011393368084", name: "사운드 30" },
-      { id: "1535920401773895720", name: "사운드 31" },
-      { id: "1535920604908363786", name: "사운드 32" },
-      { id: "1535920735875502110", name: "사운드 33" },
-      { id: "1535923287123828878", name: "사운드 34" },
-      { id: "1535923598802296892", name: "사운드 35" },
-      { id: "1535923813705842709", name: "사운드 36" },
-      { id: "1535924183891054672", name: "사운드 37" },
-      { id: "1535924318041804860", name: "사운드 38" },
-      { id: "1540745704425791498", name: "사운드 39" },
-      { id: "1540745992981315614", name: "사운드 40" },
-      { id: "1540746293184430181", name: "사운드 41" },
-      { id: "1540746469219373156", name: "사운드 42" }
+      // 스크린샷 1 (231955) 순서
+      { id: "1515715927709057084", name: "카즈사" },
+      { id: "1515716429389889647", name: "아이리" },
+      { id: "1515717013668888586", name: "shot fire" },
+      { id: "1515717276966453359", name: "모모이" },
+      { id: "1515717362178068692", name: "미도리" },
+      { id: "1515718417028612096", name: "kei" },
+      { id: "1515718796026052658", name: "kei2" },
+      { id: "1515718906927644723", name: "fu" },
+      { id: "1515718956164321341", name: "kei3" },
+      { id: "1515719658882469949", name: "sad" },
+      { id: "1515719771822358548", name: "what" },
+      { id: "1515719834636386324", name: "what2" },
+      { id: "1515719884758188173", name: "oh" },
+      { id: "1515719965494218802", name: "heart" },
+      { id: "1515720024407412746", name: "um" },
+      { id: "1515720066967015446", name: "angry" },
+      { id: "1515741605511037018", name: "코유키" },
+      { id: "1515742529541246986", name: "\"알아\"" },
+      { id: "1515744167597179042", name: "kei4" },
+      { id: "1515744217685823819", name: "kei ty" },
+      { id: "1515744246223736916", name: "hoshino" },
+
+      // 스크린샷 2 (232003) 순서
+      { id: "1515745071935524955", name: "yuuka" },
+      { id: "1515999347236671568", name: "bocchi" },
+      { id: "1535917646501904405", name: "ett" },
+      { id: "1535918256202850327", name: "코하루 신음1" },
+      { id: "1535918445982388224", name: "코하루 신음2" },
+      { id: "1535918793858220072", name: "코하루 전투" },
+      { id: "1535918942776729620", name: "코하루 패배" },
+      { id: "1535919527651446904", name: "권리고지의무" },
+      { id: "1535920011393368084", name: "방탄꼭지 CM송" },
+      { id: "1535920401773895720", name: "방탄꼭지 CM송2" },
+      { id: "1535920604908363786", name: "방탄꼭지 CM송3" },
+      { id: "1535920735875502110", name: "방탄꼭지 CM송4" },
+      { id: "1535923287123828878", name: "방탄꼭지 다음편1" },
+      { id: "1535923598802296892", name: "방탄꼭지 다음편2" },
+      { id: "1535923813705842709", name: "방탄꼭지 다음편3" },
+      { id: "1535924183891054672", name: "방탄꼭지 다음편4" },
+      { id: "1535924318041804860", name: "방탄꼭지 다음편5" },
+      { id: "1540745704425791498", name: "방탄꼭지 걸프리쉬1" },
+      { id: "1540745992981315614", name: "방탄꼭지 걸프리쉬2" },
+      { id: "1540746293184430181", name: "방탄꼭지 걸프리쉬3" },
+      { id: "1540746469219373156", name: "방탄꼭지 걸프리쉬4" }
     ];
 
     const grid = document.getElementById("grid");
-    const audioCache = {};
+    const audioPool = [];
 
     soundList.forEach(sound => {
       const btn = document.createElement("button");
       btn.className = "sound-btn";
       btn.textContent = sound.name;
 
+      const audio = new Audio(`sounds/${sound.id}.ogg`);
+      audioPool.push(audio);
+
       btn.addEventListener("click", () => {
-        if (!audioCache[sound.id]) {
-          audioCache[sound.id] = new Audio(`sounds/${sound.id}.ogg`);
-        }
-        audioCache[sound.id].currentTime = 0;
-        audioCache[sound.id].play();
+        audio.currentTime = 0;
+        audio.play().catch(() => {});
       });
 
       grid.appendChild(btn);
     });
 
-    // PWA 서비스 워커 등록
+    document.getElementById("stopAll").addEventListener("click", () => {
+      audioPool.forEach(audio => {
+        audio.pause();
+        audio.currentTime = 0;
+      });
+    });
+
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("sw.js");
     }
